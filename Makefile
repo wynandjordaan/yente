@@ -2,6 +2,8 @@
 all:
 	make api
 
+	 docker-compose up --detach
+
 build:
 	docker build -t ghcr.io/opensanctions/yente:latest .
 

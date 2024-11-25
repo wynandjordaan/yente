@@ -6,6 +6,7 @@ services:
       - "9200"
     ports:
       - "127.0.0.1:9200:9200"
+      - "127.0.0.1:9300:9300"
     container_name: index
     environment:
       - node.name=index
@@ -25,9 +26,17 @@ services:
         max_replicas_per_node: 1
       restart_policy:
         condition: on-failure
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.7.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - index
 
   app:
-    image: ghcr.io/opensanctions/yente:latest
+    image: yente:latest
     depends_on:
       - index
     ports:
@@ -36,7 +45,7 @@ services:
       YENTE_ELASTICSEARCH_URL: http://index:9200
       YENTE_STATEMENT_API: "false"
       # Set this to a randomly generated string to enable the /updatez API:
-      YENTE_UPDATE_TOKEN: ""
+      YENTE_UPDATE_TOKEN: "7a63f286-a6c1-4e08-8c97-82cf7b288ec3#"
     # If you want to index data from the host machine as a custom dataset,
     # create a volume mount here to make that data accessible from the 
     # container:
