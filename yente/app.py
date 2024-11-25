@@ -52,11 +52,15 @@ async def request_middleware(
     bind_contextvars(
         client_ip=client_ip,
     )
-    try:
-        response = await call_next(request)
-    except Exception as exc:
-        log.exception("Exception during request: %s" % type(exc))
-        response = JSONResponse(status_code=500, content={"status": "error"})
+
+    if request.url.path != "/healthz" and request.headers.get("X-API-KEY") != settings.API_KEY:
+        response = JSONResponse(status_code=401, content="Unauthorized")
+    else:
+        try:
+            response = await call_next(request)
+        except Exception as exc:
+            log.exception("Exception during request: %s" % type(exc))
+            response = JSONResponse(status_code=500, content={"status": "error"})
     time_delta = time.time() - start_time
     log.info(
         str(request.url.path),
@@ -90,7 +94,6 @@ HANDLERS: Dict[Union[Type[Exception], int], ExceptionHandler] = {
     YenteError: yente_error_handler,
 }
 
-
 def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.TITLE,
@@ -103,6 +106,7 @@ def create_app() -> FastAPI:
         redoc_url=None,
         lifespan=lifespan,
     )
+
     app.middleware("http")(request_middleware)
     app.add_middleware(TraceContextMiddleware)
     app.add_middleware(

@@ -127,6 +127,7 @@ BASE_SCHEMA = "Thing"
 PORT = int(env_str("YENTE_PORT", env_str("PORT", "8000")))
 HOST = env_str("YENTE_HOST", env_str("HOST", "0.0.0.0"))
 UPDATE_TOKEN = env_str("YENTE_UPDATE_TOKEN", "unsafe-default")
+API_KEY = env_str("YENTE_API_KEY", "qwer1234_")
 CACHE_HEADERS = {
     "Cache-Control": "public; max-age=3600",
     "X-Robots-Tag": "none",
